@@ -1,10 +1,13 @@
 
 import * as Y from 'yjs'
-import { setBenchmarkResult, gen, N, benchmarkTime, disableAutomergeBenchmarks, disablePeersCrdtsBenchmarks, disableYjsBenchmarks, logMemoryUsed, getMemUsed, deltaDeleteHelper, deltaInsertHelper } from './utils.js'
+import { setBenchmarkResult, gen, N, benchmarkTime, disableAutomerge1Benchmarks, disableAutomergeWASMBenchmarks, disableAutomergeBenchmarks, disablePeersCrdtsBenchmarks, disableYjsBenchmarks, logMemoryUsed, getMemUsed, deltaDeleteHelper, deltaInsertHelper } from './utils.js'
 import * as prng from 'lib0/prng.js'
 import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
 import Automerge from 'automerge'
+import Automerge1 from "automerge1"
+import Automerge1Backend from "automerge1/backend"
+import AutomergeBackendWasm from "automerge-backend-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -133,6 +136,74 @@ const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {
   })
 }
 
+const benchmarkAutomerge1 = (id, init, inputData, changeFunction, check) => {
+  Automerge1.setDefaultBackend(Automerge1Backend)
+  const startHeapUsed = getMemUsed()
+  if (disableAutomerge1Benchmarks) {
+    setBenchmarkResult('automerge1', id, 'skipping')
+    return
+  }
+  const emptyDoc = Automerge1.init()
+  let doc1 = Automerge1.change(emptyDoc, init)
+  let doc2 = Automerge1.applyChanges(Automerge1.init(), Automerge1.getChanges(emptyDoc, doc1))
+  let updateSize = 0
+  benchmarkTime('automerge1', `${id} (time)`, () => {
+    for (let i = 0; i < inputData.length; i++) {
+      const [updatedDoc,change] = Automerge1.change2(doc1, doc => {
+        changeFunction(doc, inputData[i], i)
+      })
+      updateSize += change.length
+      doc2 = Automerge1.applyChanges(doc2, [change])
+      doc1 = updatedDoc
+    }
+  })
+  check(doc1, doc2)
+  setBenchmarkResult('automerge1', `${id} (avgUpdateSize)`, `${math.round(updateSize / inputData.length)} bytes`)
+  const encodedState = Automerge1.save(doc1)
+  const documentSize = encodedState.length
+  setBenchmarkResult('automerge1', `${id} (docSize)`, `${documentSize} bytes`)
+  benchmarkTime('automerge1', `${id} (parseTime)`, () => {
+    Automerge1.load(encodedState)
+    logMemoryUsed('automerge1', id, startHeapUsed)
+  })
+  Automerge1.free(doc1)
+  Automerge1.free(doc2)
+}
+
+const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
+  Automerge1.setDefaultBackend(AutomergeBackendWasm)
+  const startHeapUsed = getMemUsed()
+  if (disableAutomergeWASMBenchmarks) {
+    setBenchmarkResult('automergeWASM', id, 'skipping')
+    return
+  }
+  const emptyDoc = Automerge1.init()
+  let doc1 = Automerge1.change(emptyDoc, init)
+  let doc2 = Automerge1.applyChanges(Automerge1.init(), Automerge1.getChanges(emptyDoc, doc1))
+  let updateSize = 0
+  benchmarkTime('automergeWASM', `${id} (time)`, () => {
+    for (let i = 0; i < inputData.length; i++) {
+      const [updatedDoc,change] = Automerge1.change2(doc1, doc => {
+        changeFunction(doc, inputData[i], i)
+      })
+      updateSize += change.length
+      doc2 = Automerge1.applyChanges(doc2, [change])
+      doc1 = updatedDoc
+    }
+  })
+  check(doc1, doc2)
+  setBenchmarkResult('automergeWASM', `${id} (avgUpdateSize)`, `${math.round(updateSize / inputData.length)} bytes`)
+  const encodedState = Automerge1.save(doc1)
+  const documentSize = encodedState.length
+  setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
+  benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
+    Automerge1.load(encodedState)
+    logMemoryUsed('automergeWASM', id, startHeapUsed)
+  })
+  Automerge1.free(doc1)
+  Automerge1.free(doc2)
+}
+
 {
   const benchmarkName = '[B1.1] Append N characters'
   const string = prng.word(gen, N, N)
@@ -157,6 +228,26 @@ const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {
   benchmarkAutomerge(
     benchmarkName,
     doc => { doc.text = new Automerge.Text() },
+    string.split(''),
+    (doc, s, i) => { doc.text.insertAt(i, s) },
+    (doc1, doc2) => {
+      t.assert(doc1.text.join('') === doc2.text.join(''))
+      t.assert(doc1.text.join('') === string)
+    }
+  )
+  benchmarkAutomerge1(
+    benchmarkName,
+    doc => { doc.text = new Automerge1.Text() },
+    string.split(''),
+    (doc, s, i) => { doc.text.insertAt(i, s) },
+    (doc1, doc2) => {
+      t.assert(doc1.text.join('') === doc2.text.join(''))
+      t.assert(doc1.text.join('') === string)
+    }
+  )
+  benchmarkAutomergeWASM(
+    benchmarkName,
+    doc => { doc.text = new Automerge1.Text() },
     string.split(''),
     (doc, s, i) => { doc.text.insertAt(i, s) },
     (doc1, doc2) => {
@@ -198,7 +289,29 @@ const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.text.join('') === string)
     }
   )
+  benchmarkAutomerge1(
+    benchmarkName,
+    doc => { doc.text = new Automerge1.Text() },
+    [string],
+    (doc, s, i) => { doc.text.insertAt(i, ...s) },
+    (doc1, doc2) => {
+      t.assert(doc1.text.join('') === doc2.text.join(''))
+      t.assert(doc1.text.join('') === string)
+    }
+  )
+  benchmarkAutomergeWASM(
+    benchmarkName,
+    doc => { doc.text = new Automerge1.Text() },
+    [string],
+    (doc, s, i) => { doc.text.insertAt(i, ...s) },
+    (doc1, doc2) => {
+      t.assert(doc1.text.join('') === doc2.text.join(''))
+      t.assert(doc1.text.join('') === string)
+    }
+  )
 }
+
+/*
 
 {
   const benchmarkName = '[B1.3] Prepend N characters'
@@ -567,3 +680,4 @@ const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {
     }
   )
 }
+*/

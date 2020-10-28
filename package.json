@@ -31,6 +31,8 @@
   "homepage": "https://github.com/dmonad/crdt-benchmarks#readme",
   "dependencies": {
     "automerge": "^0.14.1",
+    "automerge1": "orionz/automerge#change2",
+    "automerge-backend-wasm": "orionz/automerge#change2",
     "delta-crdts": "^0.10.3",
     "delta-crdts-msgpack-codec": "^0.2.0",
     "lib0": "^0.2.32",
@@ -38,6 +40,7 @@
     "rollup-plugin-commonjs": "^8.3.4",
     "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-terser": "^5.3.0",
+    "uuid": "^3.4.0",
     "yjs": "^13.3.0"
   },
   "devDependencies": {

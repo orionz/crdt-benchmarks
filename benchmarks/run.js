@@ -6,9 +6,18 @@ import './b1.js'
 import { benchmarkResults, N } from './utils.js'
 
 // print markdown table with the results
-let mdTable = `| N = ${N} | YJS | Automerge1 | AutomergeWASM |\n`
-mdTable += `|${"".padEnd(73, ' ')} | ${('yjs').padStart(15, ' ')} | ${('automerge1').padStart(15, ' ')} | ${('automergeWASM').padStart(15, ' ')} |\n`
+
+const benches = Object.keys(benchmarkResults)
+const crdtNames = Object.keys(benchmarkResults[benches[benches.length-1]])
+
+let mdTable = `| N = ${N} |\n`
+mdTable += `|${"".padEnd(73, ' ')} | `
+mdTable += crdtNames.map((name) => name.padStart(15, ' ')).join(' | ')
+mdTable += `|\n`
+
 for (const id in benchmarkResults) {
-  mdTable += `|${id.padEnd(73, ' ')} | ${(benchmarkResults[id].yjs || '').padStart(15, ' ')} | ${(benchmarkResults[id].automerge || '').padStart(15, ' ')} | ${(benchmarkResults[id]['delta-crdts'] || '').padStart(15, ' ')} |\n`
+  mdTable += `|${id.padEnd(73, ' ')} | `
+  mdTable += crdtNames.map((name) => (benchmarkResults[id][name] || 'missing').padStart(15, ' ')).join(' | ')
+  mdTable += `|\n`
 }
 console.log(mdTable)

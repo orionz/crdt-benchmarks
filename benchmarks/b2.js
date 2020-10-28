@@ -5,6 +5,9 @@ import * as prng from 'lib0/prng.js'
 import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
 import Automerge from 'automerge'
+import Automerge1 from "automerge1"
+import Automerge1Backend from "automerge1/backend"
+import AutomergeBackendWasm from "automerge-backend-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -110,8 +113,78 @@ const benchmarkDeltaCrdts = (id, changeDoc1, changeDoc2, check) => {
     logMemoryUsed('delta-crdts', id, startHeapUsed)
   })
 }
-
 const benchmarkAutomerge = (id, changeDoc1, changeDoc2, check) => {
+  benchmarkAutomerge0(id, changeDoc1, changeDoc2, check)
+  benchmarkAutomerge1(id, changeDoc1, changeDoc2, check)
+  benchmarkAutomergeWASM(id, changeDoc1, changeDoc2, check)
+}
+
+const benchmarkAutomerge1 = (id, changeDoc1, changeDoc2, check) => {
+  Automerge1.setDefaultBackend(Automerge1Backend)
+
+  const startHeapUsed = getMemUsed()
+  if (N > 10000 || disableAutomergeBenchmarks) {
+    setBenchmarkResult('automerge1', id, 'skipping')
+    return
+  }
+  const emptyDoc = Automerge1.init()
+  let [doc1, change1] = Automerge1.change2(emptyDoc, doc => {
+    doc.text = new Automerge1.Text()
+    doc.text.insertAt(0, ...initText)
+  })
+  let doc2 = Automerge1.applyChanges(Automerge1.init(), [change1])
+  let updateSize = 0
+  benchmarkTime('automerge1', `${id} (time)`, () => {
+    const [updatedDoc1, change1] = Automerge1.change2(doc1, changeDoc1)
+    const [updatedDoc2, change2] = Automerge1.change2(doc2, changeDoc2)
+    updateSize += change1.length + change2.length
+    doc2 = Automerge1.applyChanges(updatedDoc2, [change1])
+    doc1 = Automerge1.applyChanges(updatedDoc1, [change2])
+  })
+  check(doc1, doc2)
+  setBenchmarkResult('automerge1', `${id} (updateSize)`, `${math.round(updateSize)} bytes`)
+  const encodedState = Automerge1.save(doc1)
+  const documentSize = encodedState.length
+  setBenchmarkResult('automerge1', `${id} (docSize)`, `${documentSize} bytes`)
+  benchmarkTime('automerge1', `${id} (parseTime)`, () => {
+    Automerge1.load(encodedState)
+  })
+  logMemoryUsed('automerge1', id, startHeapUsed)
+}
+
+const benchmarkAutomergeWASM = (id, changeDoc1, changeDoc2, check) => {
+  Automerge1.setDefaultBackend(AutomergeBackendWasm)
+
+  const startHeapUsed = getMemUsed()
+  if (N > 10000 || disableAutomergeBenchmarks) {
+    setBenchmarkResult('automergeWASM', id, 'skipping')
+    return
+  }
+  const emptyDoc = Automerge1.init()
+  let [doc1, change1] = Automerge1.change2(emptyDoc, doc => {
+    doc.text = new Automerge1.Text()
+    doc.text.insertAt(0, ...initText)
+  })
+  let doc2 = Automerge1.applyChanges(Automerge1.init(), [change1])
+  let updateSize = 0
+  benchmarkTime('automergeWASM', `${id} (time)`, () => {
+    const [updatedDoc1, change1] = Automerge1.change2(doc1, changeDoc1)
+    const [updatedDoc2, change2] = Automerge1.change2(doc2, changeDoc2)
+    updateSize += change1.length + change2.length
+    doc2 = Automerge1.applyChanges(updatedDoc2, [change1])
+    doc1 = Automerge1.applyChanges(updatedDoc1, [change2])
+  })
+  check(doc1, doc2)
+  setBenchmarkResult('automergeWASM', `${id} (updateSize)`, `${math.round(updateSize)} bytes`)
+  const encodedState = Automerge1.save(doc1)
+  const documentSize = encodedState.length
+  setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
+  benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
+    Automerge1.load(encodedState)
+  })
+  logMemoryUsed('automergeWASM', id, startHeapUsed)
+}
+const benchmarkAutomerge0 = (id, changeDoc1, changeDoc2, check) => {
   const startHeapUsed = getMemUsed()
   if (N > 10000 || disableAutomergeBenchmarks) {
     setBenchmarkResult('automerge', id, 'skipping')
@@ -143,7 +216,6 @@ const benchmarkAutomerge = (id, changeDoc1, changeDoc2, check) => {
   })
   logMemoryUsed('automerge', id, startHeapUsed)
 }
-
 {
   const benchmarkName = '[B2.1] Concurrently insert string of length N at index 0'
   const string1 = prng.word(gen, N, N)

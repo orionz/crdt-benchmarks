@@ -10,7 +10,8 @@ import AutomergeWASM from 'automerge-wasm'
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 
-const EDITS = edits.slice(0,100)
+//const EDITS = edits.slice(0,100)
+const EDITS = edits
 const DeltaRGA = DeltaCRDT('rga')
 
 const benchmarkYjs = (id, inputData, changeFunction, check) => {

@@ -90,4 +90,32 @@ export default [{
     commonjs(),
     terserPlugin
   ]
+}, {
+  input: './benchmarks/bundleAutomerge1.js',
+  output: {
+    file: './dist/bundleAutomerge1.js',
+    format: 'es',
+    sourcemap: true
+  },
+  plugins: [
+    nodeResolve({
+      mainFields: ['module', 'main']
+    }),
+    commonjs(),
+    terserPlugin
+  ]
+}, {
+  input: './benchmarks/bundleAutomergeWASM.js',
+  output: {
+    file: './dist/bundleAutomergeWASM.js',
+    format: 'es',
+    sourcemap: true
+  },
+  plugins: [
+    nodeResolve({
+      mainFields: ['module', 'main']
+    }),
+    commonjs(),
+    terserPlugin
+  ]
 }]

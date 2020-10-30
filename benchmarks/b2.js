@@ -7,7 +7,6 @@ import * as t from 'lib0/testing.js'
 import Automerge from 'automerge'
 import Automerge1 from "automerge1"
 import Automerge1Backend from "automerge1/backend"
-import AutomergeBackendWasm from "automerge-backend-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -120,8 +119,6 @@ const benchmarkAutomerge = (id, changeDoc1, changeDoc2, check) => {
 }
 
 const benchmarkAutomerge1 = (id, changeDoc1, changeDoc2, check) => {
-  Automerge1.setDefaultBackend(Automerge1Backend)
-
   const startHeapUsed = getMemUsed()
   if (N > 10000 || disableAutomergeBenchmarks) {
     setBenchmarkResult('automerge1', id, 'skipping')
@@ -153,8 +150,6 @@ const benchmarkAutomerge1 = (id, changeDoc1, changeDoc2, check) => {
 }
 
 const benchmarkAutomergeWASM = (id, changeDoc1, changeDoc2, check) => {
-  Automerge1.setDefaultBackend(AutomergeBackendWasm)
-
   const startHeapUsed = getMemUsed()
   if (N > 10000 || disableAutomergeBenchmarks) {
     setBenchmarkResult('automergeWASM', id, 'skipping')

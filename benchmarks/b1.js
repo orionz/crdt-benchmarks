@@ -6,7 +6,6 @@ import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
 import Automerge, { change } from 'automerge'
 import Automerge1 from "automerge1"
-import AutomergeWASM from "automerge-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -112,7 +111,7 @@ const benchmarkAllAutomerge = (id, init, inputData, changeFunction, check) => {
 const benchmarkAllAutomergeText = (id, inputData, changeFunction, check) => {
   benchmarkAutomerge(id, doc => { doc.text = new Automerge.Text() }, inputData, changeFunction, check)
   benchmarkAutomerge1(id, doc => { doc.text = new Automerge1.Text() }, inputData, changeFunction, check)
-  benchmarkAutomergeWASM(id, doc => { doc.text = new Automerge1.Text() }, inputData, changeFunction, check)
+  benchmarkAutomergeWASM(id, doc => { doc.text = new AutomergeWASM.Text() }, inputData, changeFunction, check)
 }
 
 const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {

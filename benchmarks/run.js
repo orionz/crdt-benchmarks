@@ -9,6 +9,6 @@ import { benchmarkResults, N } from './utils.js'
 let mdTable = `| N = ${N} | YJS | Automerge1 | AutomergeWASM |\n`
 mdTable += `|${"".padEnd(73, ' ')} | ${('yjs').padStart(15, ' ')} | ${('automerge1').padStart(15, ' ')} | ${('automergeWASM').padStart(15, ' ')} |\n`
 for (const id in benchmarkResults) {
-  mdTable += `|${id.padEnd(73, ' ')} | ${(benchmarkResults[id].yjs || '').padStart(15, ' ')} | ${(benchmarkResults[id].automerge || '').padStart(15, ' ')} | ${(benchmarkResults[id]['delta-crdts'] || '').padStart(15, ' ')} |\n`
+  mdTable += `|${id.padEnd(73, ' ')} | ${(benchmarkResults[id].yjs || '').padStart(15, ' ')} | ${(benchmarkResults[id].automerge1 || '').padStart(15, ' ')} | ${(benchmarkResults[id].automergeWASM || '').padStart(15, ' ')} |\n`
 }
 console.log(mdTable)

@@ -113,8 +113,8 @@ const benchmarkDeltaCrdts = (id, changeDoc1, changeDoc2, check) => {
   })
 }
 const benchmarkAutomerge = (id, changeDoc1, changeDoc2, check) => {
-  benchmarkAutomerge0(id, changeDoc1, changeDoc2, check)
-  benchmarkAutomerge1(id, changeDoc1, changeDoc2, check)
+  //benchmarkAutomerge0(id, changeDoc1, changeDoc2, check)
+  //benchmarkAutomerge1(id, changeDoc1, changeDoc2, check)
   benchmarkAutomergeWASM(id, changeDoc1, changeDoc2, check)
 }
 
@@ -216,6 +216,7 @@ const benchmarkAutomerge0 = (id, changeDoc1, changeDoc2, check) => {
   })
   logMemoryUsed('automerge', id, startHeapUsed)
 }
+/*
 {
   const benchmarkName = '[B2.1] Concurrently insert string of length N at index 0'
   const string1 = prng.word(gen, N, N)
@@ -353,6 +354,7 @@ const benchmarkAutomerge0 = (id, changeDoc1, changeDoc2, check) => {
     }
   )
 }
+*/
 
 {
   const benchmarkName = '[B2.4] Concurrently insert & delete'
@@ -378,6 +380,7 @@ const benchmarkAutomerge0 = (id, changeDoc1, changeDoc2, check) => {
   }
   const input1 = genInput()
   const input2 = genInput()
+  /*
   benchmarkYjs(
     benchmarkName,
     doc1 => {
@@ -428,6 +431,7 @@ const benchmarkAutomerge0 = (id, changeDoc1, changeDoc2, check) => {
       t.assert(doc1.value().join('') === doc2.value().join(''))
     }
   )
+  */
   benchmarkAutomerge(
     benchmarkName,
     doc1 => {

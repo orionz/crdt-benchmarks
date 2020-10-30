@@ -254,6 +254,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       //t.assert(doc1.getText('text').toString() === finalText)
     }
   )
+  /*
   benchmarkDeltaCRDTs(
     benchmarkName,
     //edits,
@@ -311,6 +312,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       //t.assert(doc1.text.join('') === finalText)
     }
   )
+  */
   benchmarkAutomergeWASM(
     benchmarkName,
     doc => { doc.text = new AutomergeWASM.Text() },

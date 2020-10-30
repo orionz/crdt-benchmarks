@@ -3,7 +3,7 @@ import * as prng from 'lib0/prng.js'
 import * as metric from 'lib0/metric.js'
 import * as math from 'lib0/math.js'
 
-export const N = 25
+export const N = 1000
 export const disableAutomergeBenchmarks = false
 export const disableAutomerge1Benchmarks = false
 export const disableAutomergeWASMBenchmarks = false

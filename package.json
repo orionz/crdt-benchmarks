@@ -13,6 +13,7 @@
     "dist": "npm run clean; rollup -c; gzip --keep dist/*",
     "start": "npm run dist && node --expose-gc dist/benchmark.cjs",
     "watch": "npm run dist && rollup -wc",
+    "perf": "0x --output-dir perf dist/benchmark.cjs",
     "lint": "standard && tsc"
   },
   "repository": {
@@ -44,6 +45,7 @@
     "yjs": "^13.3.0"
   },
   "devDependencies": {
+    "0x": "^4.10.2",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
     "standard": "^13.1.0",

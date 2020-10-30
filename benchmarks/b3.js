@@ -5,12 +5,13 @@ import * as t from 'lib0/testing.js'
 import * as math from 'lib0/math.js'
 import Automerge from 'automerge'
 import Automerge1 from 'automerge1'
-import AutomergeWASM from 'automergeWASM'
+import AutomergeWASM from 'automerge-wasm'
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
 
 const sqrtN = math.floor(Math.sqrt(N)) * 20
+console.log('N=', N)
 console.log('sqrtN =', sqrtN)
 
 const benchmarkYjs = (id, changeDoc, check) => {
@@ -99,10 +100,10 @@ const benchmarkDeltaCrdts = (id, changeDoc, check) => {
   })
 }
 
-const benchmarkAutomerge = (id, changeDoc1, changeDoc2, check) => {
-    benchmarkAutomerge0(id, changeDoc1, changeDoc2, check)
-    benchmarkAutomerge1(id, changeDoc1, changeDoc2, check)
-    benchmarkAutomergeWASM(id, changeDoc1, changeDoc2, check)
+const benchmarkAutomerge = (id, initDoc, changeDoc2, check) => {
+    benchmarkAutomerge0(id, initDoc, changeDoc2, check)
+    benchmarkAutomerge1(id, initDoc, changeDoc2, check)
+    benchmarkAutomergeWASM(id, initDoc, changeDoc2, check)
 }
 
 const benchmarkAutomerge0 = (id, init, changeDoc, check) => {
@@ -158,13 +159,17 @@ const benchmarkAutomerge1 = (id, init, changeDoc, check) => {
   for (let i = 0; i < sqrtN; i++) {
     docs.push(Automerge1.init())
   }
-  const [initDoc, initChange]  = Automerge1.change2(docs[0], init)
-  for (let i = 0; i < docs.length; i++) {
-    docs[i] = Automerge1.applyChanges(docs[i], [ initChange ])
+  const [initDoc, initChange]  = Automerge1.change2(Automerge1.init(), init)
+  Automerge1.free(initDoc)
+  if (initChange) {
+    for (let i = 0; i < docs.length; i++) {
+      docs[i] = Automerge1.applyChanges(docs[i], [ initChange ])
+    }
   }
   const changes = []
   for (let i = 0; i < docs.length; i++) {
-    const [ updatedDoc , change ] = Automerge1.change2(docs[i], d => { changeDoc(d, i) })
+    const doc = docs[i]
+    const [ updatedDoc , change ] = Automerge1.change2(doc, d => { changeDoc(d, i) })
     changes.push(change)
     docs[i] = updatedDoc
   }
@@ -182,6 +187,7 @@ const benchmarkAutomerge1 = (id, init, changeDoc, check) => {
     const doc = Automerge1.load(encodedState) // eslint-disable-line
     logMemoryUsed('automerge1', id, startHeapUsed)
   })
+  docs.forEach((d) => Automerge1.free(d))
 }
 
 const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
@@ -194,9 +200,12 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
   for (let i = 0; i < sqrtN; i++) {
     docs.push(AutomergeWASM.init())
   }
-  const [initDoc, initChange]  = AutomergeWASM.change2(docs[0], init)
-  for (let i = 0; i < docs.length; i++) {
-    docs[i] = AutomergeWASM.applyChanges(docs[i], [ initChange ])
+  const [initDoc, initChange]  = AutomergeWASM.change2(AutomergeWASM.init(), init)
+  AutomergeWASM.free(initDoc)
+  if (initChange) {
+    for (let i = 0; i < docs.length; i++) {
+      docs[i] = AutomergeWASM.applyChanges(docs[i], [ initChange ])
+    }
   }
   const changes = []
   for (let i = 0; i < docs.length; i++) {
@@ -218,6 +227,7 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
     const doc = AutomergeWASM.load(encodedState) // eslint-disable-line
     logMemoryUsed('automergeWASM', id, startHeapUsed)
   })
+  docs.forEach((d) => AutomergeWASM.free(d))
 }
 
 

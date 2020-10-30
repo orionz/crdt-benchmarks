@@ -178,6 +178,8 @@ const benchmarkAutomergeWASM = (id, changeDoc1, changeDoc2, check) => {
     Automerge1.load(encodedState)
   })
   logMemoryUsed('automergeWASM', id, startHeapUsed)
+  AutomergeWASM.free(doc1)
+  AutomergeWASM.free(doc2)
 }
 const benchmarkAutomerge0 = (id, changeDoc1, changeDoc2, check) => {
   const startHeapUsed = getMemUsed()

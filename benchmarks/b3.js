@@ -1,9 +1,11 @@
 
 import * as Y from 'yjs'
-import { setBenchmarkResult, benchmarkTime, N, disableAutomergeBenchmarks, disableYjsBenchmarks, disablePeersCrdtsBenchmarks, logMemoryUsed, getMemUsed } from './utils.js'
+import { setBenchmarkResult, benchmarkTime, N, disableAutomerge1Benchmarks, disableAutomergeWASMBenchmarks, disableAutomergeBenchmarks, disableYjsBenchmarks, disablePeersCrdtsBenchmarks, logMemoryUsed, getMemUsed } from './utils.js'
 import * as t from 'lib0/testing.js'
 import * as math from 'lib0/math.js'
 import Automerge from 'automerge'
+import Automerge1 from 'automerge1'
+import AutomergeWASM from 'automergeWASM'
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -97,7 +99,13 @@ const benchmarkDeltaCrdts = (id, changeDoc, check) => {
   })
 }
 
-const benchmarkAutomerge = (id, init, changeDoc, check) => {
+const benchmarkAutomerge = (id, changeDoc1, changeDoc2, check) => {
+    benchmarkAutomerge0(id, changeDoc1, changeDoc2, check)
+    benchmarkAutomerge1(id, changeDoc1, changeDoc2, check)
+    benchmarkAutomergeWASM(id, changeDoc1, changeDoc2, check)
+}
+
+const benchmarkAutomerge0 = (id, init, changeDoc, check) => {
   const startHeapUsed = getMemUsed()
   if (N > 10000 || disableAutomergeBenchmarks) {
     setBenchmarkResult('automerge', id, 'skipping')
@@ -139,6 +147,79 @@ const benchmarkAutomerge = (id, init, changeDoc, check) => {
     logMemoryUsed('automerge', id, startHeapUsed)
   })
 }
+
+const benchmarkAutomerge1 = (id, init, changeDoc, check) => {
+  const startHeapUsed = getMemUsed()
+  if (N > 10000 || disableAutomerge1Benchmarks) {
+    setBenchmarkResult('automerge1', id, 'skipping')
+    return
+  }
+  const docs = []
+  for (let i = 0; i < sqrtN; i++) {
+    docs.push(Automerge1.init())
+  }
+  const [initDoc, initChange]  = Automerge1.change2(docs[0], init)
+  for (let i = 0; i < docs.length; i++) {
+    docs[i] = Automerge1.applyChanges(docs[i], [ initChange ])
+  }
+  const changes = []
+  for (let i = 0; i < docs.length; i++) {
+    const [ updatedDoc , change ] = Automerge1.change2(docs[i], d => { changeDoc(d, i) })
+    changes.push(change)
+    docs[i] = updatedDoc
+  }
+  docs[0] = Automerge1.applyChanges(docs[0], changes)
+  benchmarkTime('automerge1', `${id} (time)`, () => {
+    docs[1] = Automerge1.applyChanges(docs[1], changes)
+  })
+  check(docs.slice(0, 2))
+  setBenchmarkResult('automerge1', `${id} (updateSize)`, `${changes.reduce((len, change) => len + change.length, 0)} bytes`)
+  const encodedState = Automerge1.save(docs[0])
+  const documentSize = encodedState.length
+  setBenchmarkResult('automerge1', `${id} (docSize)`, `${documentSize} bytes`)
+  benchmarkTime('automerge1', `${id} (parseTime)`, () => {
+    // @ts-ignore
+    const doc = Automerge1.load(encodedState) // eslint-disable-line
+    logMemoryUsed('automerge1', id, startHeapUsed)
+  })
+}
+
+const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
+  const startHeapUsed = getMemUsed()
+  if (N > 10000 || disableAutomergeWASMBenchmarks) {
+    setBenchmarkResult('automergeWASM', id, 'skipping')
+    return
+  }
+  const docs = []
+  for (let i = 0; i < sqrtN; i++) {
+    docs.push(AutomergeWASM.init())
+  }
+  const [initDoc, initChange]  = AutomergeWASM.change2(docs[0], init)
+  for (let i = 0; i < docs.length; i++) {
+    docs[i] = AutomergeWASM.applyChanges(docs[i], [ initChange ])
+  }
+  const changes = []
+  for (let i = 0; i < docs.length; i++) {
+    const [ updatedDoc , change ] = AutomergeWASM.change2(docs[i], d => { changeDoc(d, i) })
+    changes.push(change)
+    docs[i] = updatedDoc
+  }
+  docs[0] = AutomergeWASM.applyChanges(docs[0], changes)
+  benchmarkTime('automergeWASM', `${id} (time)`, () => {
+    docs[1] = AutomergeWASM.applyChanges(docs[1], changes)
+  })
+  check(docs.slice(0, 2))
+  setBenchmarkResult('automergeWASM', `${id} (updateSize)`, `${changes.reduce((len, change) => len + change.length, 0)} bytes`)
+  const encodedState = AutomergeWASM.save(docs[0])
+  const documentSize = encodedState.length
+  setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
+  benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
+    // @ts-ignore
+    const doc = AutomergeWASM.load(encodedState) // eslint-disable-line
+    logMemoryUsed('automergeWASM', id, startHeapUsed)
+  })
+}
+
 
 {
   const benchmarkName = '[B3.1] 20√N clients concurrently set number in Map'

@@ -6,6 +6,7 @@ import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
 import Automerge, { change } from 'automerge'
 import Automerge1 from "automerge1"
+import AutomergeWASM from "automerge-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')

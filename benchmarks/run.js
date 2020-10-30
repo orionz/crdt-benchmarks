@@ -2,7 +2,7 @@ import './bundle.js'
 import './b1.js'
 import './b2.js'
 import './b3.js'
-//import './b4.js'
+import './b4.js'
 import { benchmarkResults, N } from './utils.js'
 
 // print markdown table with the results

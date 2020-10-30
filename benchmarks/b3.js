@@ -222,11 +222,13 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
   const encodedState = AutomergeWASM.save(docs[0])
   const documentSize = encodedState.length
   setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
+  let loadDoc = null
   benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
     // @ts-ignore
-    const doc = AutomergeWASM.load(encodedState) // eslint-disable-line
+    loadDoc = AutomergeWASM.load(encodedState) // eslint-disable-line
     logMemoryUsed('automergeWASM', id, startHeapUsed)
   })
+  AutomergeWASM.free(loadDoc)
   docs.forEach((d) => AutomergeWASM.free(d))
 }
 

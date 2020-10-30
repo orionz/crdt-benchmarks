@@ -206,10 +206,12 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
   const encodedState = AutomergeWASM.save(doc1)
   const documentSize = encodedState.length
   setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
+  let loadDoc = null
   benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
-    AutomergeWASM.load(encodedState)
+    loadDoc = AutomergeWASM.load(encodedState)
     logMemoryUsed('automergeWASM', id, startHeapUsed)
   })
+  AutomergeWASM.free(loadDoc)
   AutomergeWASM.free(doc1)
   AutomergeWASM.free(doc2)
 }

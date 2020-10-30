@@ -6,7 +6,7 @@ import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
 import Automerge from 'automerge'
 import Automerge1 from "automerge1"
-import Automerge1Backend from "automerge1/backend"
+import AutomergeWASM from "automerge-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -155,29 +155,32 @@ const benchmarkAutomergeWASM = (id, changeDoc1, changeDoc2, check) => {
     setBenchmarkResult('automergeWASM', id, 'skipping')
     return
   }
-  const emptyDoc = Automerge1.init()
-  let [doc1, change1] = Automerge1.change2(emptyDoc, doc => {
-    doc.text = new Automerge1.Text()
+  const emptyDoc = AutomergeWASM.init()
+  let [doc1, change1] = AutomergeWASM.change2(emptyDoc, doc => {
+    doc.text = new AutomergeWASM.Text()
     doc.text.insertAt(0, ...initText)
   })
-  let doc2 = Automerge1.applyChanges(Automerge1.init(), [change1])
+  let doc2 = AutomergeWASM.applyChanges(AutomergeWASM.init(), [change1])
   let updateSize = 0
   benchmarkTime('automergeWASM', `${id} (time)`, () => {
-    const [updatedDoc1, change1] = Automerge1.change2(doc1, changeDoc1)
-    const [updatedDoc2, change2] = Automerge1.change2(doc2, changeDoc2)
+    const [updatedDoc1, change1] = AutomergeWASM.change2(doc1, changeDoc1)
+    const [updatedDoc2, change2] = AutomergeWASM.change2(doc2, changeDoc2)
     updateSize += change1.length + change2.length
-    doc2 = Automerge1.applyChanges(updatedDoc2, [change1])
-    doc1 = Automerge1.applyChanges(updatedDoc1, [change2])
+    doc2 = AutomergeWASM.applyChanges(updatedDoc2, [change1])
+    doc1 = AutomergeWASM.applyChanges(updatedDoc1, [change2])
   })
   check(doc1, doc2)
   setBenchmarkResult('automergeWASM', `${id} (updateSize)`, `${math.round(updateSize)} bytes`)
-  const encodedState = Automerge1.save(doc1)
+  const encodedState = AutomergeWASM.save(doc1)
   const documentSize = encodedState.length
   setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
+
+  let loadDoc = null
   benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
-    Automerge1.load(encodedState)
+    loadDoc = AutomergeWASM.load(encodedState)
   })
   logMemoryUsed('automergeWASM', id, startHeapUsed)
+  AutomergeWASM.free(loadDoc)
   AutomergeWASM.free(doc1)
   AutomergeWASM.free(doc2)
 }

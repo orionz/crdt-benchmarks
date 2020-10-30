@@ -4,7 +4,7 @@ import { setBenchmarkResult, gen, N, benchmarkTime, disableAutomerge1Benchmarks,
 import * as prng from 'lib0/prng.js'
 import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
-import Automerge from 'automerge'
+import Automerge, { change } from 'automerge'
 import Automerge1 from "automerge1"
 import AutomergeWASM from "automerge-wasm"
 import DeltaCRDT from 'delta-crdts'
@@ -103,6 +103,18 @@ const benchmarkDeltaCrdts = (id, inputData, changeFunction, check) => {
  * @param {function(any, T, number):void} changeFunction Is called on every element in inputData
  * @param {function(any, any):void} check Check if the benchmark result is correct (all clients end up with the expected result)
  */
+const benchmarkAllAutomerge = (id, init, inputData, changeFunction, check) => {
+  benchmarkAutomerge(id, init, inputData, changeFunction, check)
+  benchmarkAutomerge1(id, init, inputData, changeFunction, check)
+  benchmarkAutomergeWASM(id, init, inputData, changeFunction, check)
+}
+
+const benchmarkAllAutomergeText = (id, inputData, changeFunction, check) => {
+  benchmarkAutomerge(id, doc => { doc.text = new Automerge.Text() }, inputData, changeFunction, check)
+  benchmarkAutomerge1(id, doc => { doc.text = new Automerge1.Text() }, inputData, changeFunction, check)
+  benchmarkAutomergeWASM(id, doc => { doc.text = new Automerge1.Text() }, inputData, changeFunction, check)
+}
+
 const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {
   const startHeapUsed = getMemUsed()
   if (disableAutomergeBenchmarks) {
@@ -172,6 +184,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
   const startHeapUsed = getMemUsed()
   if (disableAutomergeWASMBenchmarks) {
     setBenchmarkResult('automergeWASM', id, 'skipping')
+    exit
     return
   }
   const emptyDoc = AutomergeWASM.init()
@@ -222,29 +235,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === string)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
-    string.split(''),
-    (doc, s, i) => { doc.text.insertAt(i, s) },
-    (doc1, doc2) => {
-      t.assert(doc1.text.join('') === doc2.text.join(''))
-      t.assert(doc1.text.join('') === string)
-    }
-  )
-  benchmarkAutomerge1(
-    benchmarkName,
-    doc => { doc.text = new Automerge1.Text() },
-    string.split(''),
-    (doc, s, i) => { doc.text.insertAt(i, s) },
-    (doc1, doc2) => {
-      t.assert(doc1.text.join('') === doc2.text.join(''))
-      t.assert(doc1.text.join('') === string)
-    }
-  )
-  benchmarkAutomergeWASM(
-    benchmarkName,
-    doc => { doc.text = new AutomergeWASM.Text() },
     string.split(''),
     (doc, s, i) => { doc.text.insertAt(i, s) },
     (doc1, doc2) => {
@@ -276,29 +268,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === string)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
-    [string],
-    (doc, s, i) => { doc.text.insertAt(i, ...s) },
-    (doc1, doc2) => {
-      t.assert(doc1.text.join('') === doc2.text.join(''))
-      t.assert(doc1.text.join('') === string)
-    }
-  )
-  benchmarkAutomerge1(
-    benchmarkName,
-    doc => { doc.text = new Automerge1.Text() },
-    [string],
-    (doc, s, i) => { doc.text.insertAt(i, ...s) },
-    (doc1, doc2) => {
-      t.assert(doc1.text.join('') === doc2.text.join(''))
-      t.assert(doc1.text.join('') === string)
-    }
-  )
-  benchmarkAutomergeWASM(
-    benchmarkName,
-    doc => { doc.text = new AutomergeWASM.Text() },
     [string],
     (doc, s, i) => { doc.text.insertAt(i, ...s) },
     (doc1, doc2) => {
@@ -307,7 +278,6 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
     }
   )
 }
-
 
 {
   const benchmarkName = '[B1.3] Prepend N characters'
@@ -331,9 +301,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === string)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
     reversedString.split(''),
     (doc, s, i) => { doc.text.insertAt(0, s) },
     (doc1, doc2) => {
@@ -392,9 +361,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === string)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
     input,
     (doc, op, i) => { doc.text.insertAt(op.index, op.insert) },
     (doc1, doc2) => {
@@ -455,9 +423,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === string)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
     input,
     (doc, op, i) => { doc.text.insertAt(op.index, ...op.insert) },
     (doc1, doc2) => {
@@ -512,9 +479,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === '')
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
     [string],
     (doc, s, i) => {
       doc.text.insertAt(i, ...s)
@@ -600,9 +566,8 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.assert(doc1.value().join('') === string)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomergeText(
     benchmarkName,
-    doc => { doc.text = new Automerge.Text() },
     input,
     (doc, op, i) => {
       if (op.insert !== undefined) {
@@ -651,7 +616,6 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
 }
 
 // benchmarks with numbers begin here
-
 {
   const benchmarkName = '[B1.8] Append N numbers'
   const numbers = Array.from({ length: N }).map(() => prng.uint32(gen, 0, 0x7fffffff))
@@ -673,7 +637,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.compare(doc1.value(), numbers)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomerge(
     benchmarkName,
     doc => { doc.array = [] },
     numbers,
@@ -726,7 +690,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.compare(doc1.value(), numbers)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomerge(
     benchmarkName,
     doc => { doc.array = [] },
     [numbers],
@@ -781,7 +745,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.compare(doc1.value(), numbersReversed)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomerge(
     benchmarkName,
     doc => { doc.array = [] },
     numbers,
@@ -843,7 +807,7 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
       t.compare(doc1.value(), numbers)
     }
   )
-  benchmarkAutomerge(
+  benchmarkAllAutomerge(
     benchmarkName,
     doc => { doc.array = [] },
     input,
@@ -874,3 +838,4 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
     }
   )
 }
+

@@ -6,8 +6,7 @@ import * as math from 'lib0/math.js'
 import * as t from 'lib0/testing.js'
 import Automerge, { change } from 'automerge'
 import Automerge1 from "automerge1"
-import Automerge1Backend from "automerge1/backend"
-import AutomergeBackendWasm from "automerge-backend-wasm"
+import AutomergeWASM from "automerge-wasm"
 import DeltaCRDT from 'delta-crdts'
 import deltaCodec from 'delta-crdts-msgpack-codec'
 const DeltaRGA = DeltaCRDT('rga')
@@ -149,7 +148,6 @@ const benchmarkAutomerge = (id, init, inputData, changeFunction, check) => {
 }
 
 const benchmarkAutomerge1 = (id, init, inputData, changeFunction, check) => {
-  Automerge1.setDefaultBackend(Automerge1Backend)
   const startHeapUsed = getMemUsed()
   if (disableAutomerge1Benchmarks) {
     setBenchmarkResult('automerge1', id, 'skipping')
@@ -183,38 +181,37 @@ const benchmarkAutomerge1 = (id, init, inputData, changeFunction, check) => {
 }
 
 const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
-  Automerge1.setDefaultBackend(AutomergeBackendWasm)
   const startHeapUsed = getMemUsed()
   if (disableAutomergeWASMBenchmarks) {
     setBenchmarkResult('automergeWASM', id, 'skipping')
     exit
     return
   }
-  const emptyDoc = Automerge1.init()
-  let doc1 = Automerge1.change(emptyDoc, init)
-  let doc2 = Automerge1.applyChanges(Automerge1.init(), Automerge1.getChanges(emptyDoc, doc1))
+  const emptyDoc = AutomergeWASM.init()
+  let doc1 = AutomergeWASM.change(emptyDoc, init)
+  let doc2 = AutomergeWASM.applyChanges(AutomergeWASM.init(), AutomergeWASM.getChanges(emptyDoc, doc1))
   let updateSize = 0
   benchmarkTime('automergeWASM', `${id} (time)`, () => {
     for (let i = 0; i < inputData.length; i++) {
-      const [updatedDoc,change] = Automerge1.change2(doc1, doc => {
+      const [updatedDoc,change] = AutomergeWASM.change2(doc1, doc => {
         changeFunction(doc, inputData[i], i)
       })
       updateSize += change.length
-      doc2 = Automerge1.applyChanges(doc2, [change])
+      doc2 = AutomergeWASM.applyChanges(doc2, [change])
       doc1 = updatedDoc
     }
   })
   check(doc1, doc2)
   setBenchmarkResult('automergeWASM', `${id} (avgUpdateSize)`, `${math.round(updateSize / inputData.length)} bytes`)
-  const encodedState = Automerge1.save(doc1)
+  const encodedState = AutomergeWASM.save(doc1)
   const documentSize = encodedState.length
   setBenchmarkResult('automergeWASM', `${id} (docSize)`, `${documentSize} bytes`)
   benchmarkTime('automergeWASM', `${id} (parseTime)`, () => {
-    Automerge1.load(encodedState)
+    AutomergeWASM.load(encodedState)
     logMemoryUsed('automergeWASM', id, startHeapUsed)
   })
-  Automerge1.free(doc1)
-  Automerge1.free(doc2)
+  AutomergeWASM.free(doc1)
+  AutomergeWASM.free(doc2)
 }
 
 {

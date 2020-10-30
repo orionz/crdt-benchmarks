@@ -19,5 +19,6 @@ for (const id in benchmarkResults) {
   mdTable += `|${id.padEnd(73, ' ')} | `
   mdTable += crdtNames.map((name) => (benchmarkResults[id][name] || 'missing').padStart(15, ' ')).join(' | ')
   mdTable += `|\n`
+
 }
 console.log(mdTable)

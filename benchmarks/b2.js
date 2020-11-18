@@ -151,10 +151,12 @@ const benchmarkAutomerge1 = (id, changeDoc1, changeDoc2, check) => {
 
 const benchmarkAutomergeWASM = (id, changeDoc1, changeDoc2, check) => {
   const startHeapUsed = getMemUsed()
+  /*
   if (N > 10000 || disableAutomergeBenchmarks) {
     setBenchmarkResult('automergeWASM', id, 'skipping')
     return
   }
+  */
   const emptyDoc = AutomergeWASM.init()
   let [doc1, change1] = AutomergeWASM.change2(emptyDoc, doc => {
     doc.text = new AutomergeWASM.Text()

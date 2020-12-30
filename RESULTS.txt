@@ -82,3 +82,92 @@ Orion's Ryzen 9 3950X
 |[B3.4] 20√N clients concurrently insert text in Array (memUsed)           |            3 MB |           20 MB |          1.5 MB|
 |[B3.4] 20√N clients concurrently insert text in Array (parseTime)         |           11 ms |         1231 ms |           30 ms|
 
+| N = 1000 |
+|                                                                          |             yjs |      automerge1 |   automergeWASM|
+|Version                                                                   |          13.4.1 |      1.0.0-pre1 |      1.0.0-pre1|
+|Bundle size                                                               |     71215 bytes |    351104 bytes |     96535 bytes|
+|Bundle size (gzipped)                                                     |     20870 bytes |     87762 bytes |     28542 bytes|
+|[B1.1] Append N characters (time)                                         |          109 ms |          932 ms |          175 ms|
+|[B1.1] Append N characters (avgUpdateSize)                                |        27 bytes |       107 bytes |       107 bytes|
+|[B1.1] Append N characters (docSize)                                      |      1031 bytes |      1192 bytes |    106741 bytes|
+|[B1.1] Append N characters (memUsed)                                      |        263.4 kB |         22.3 MB |        443.4 kB|
+|[B1.1] Append N characters (parseTime)                                    |            4 ms |          463 ms |           22 ms|
+|[B1.2] Insert string of length N (time)                                   |            1 ms |          353 ms |           24 ms|
+|[B1.2] Insert string of length N (avgUpdateSize)                          |      1030 bytes |      1118 bytes |      1118 bytes|
+|[B1.2] Insert string of length N (docSize)                                |      1030 bytes |      1178 bytes |      1178 bytes|
+|[B1.2] Insert string of length N (memUsed)                                |             0 B |          6.3 MB |        173.9 kB|
+|[B1.2] Insert string of length N (parseTime)                              |            4 ms |           90 ms |           15 ms|
+|[B1.3] Prepend N characters (time)                                        |           92 ms |         2170 ms |          177 ms|
+|[B1.3] Prepend N characters (avgUpdateSize)                               |        27 bytes |       102 bytes |       102 bytes|
+|[B1.3] Prepend N characters (docSize)                                     |      1041 bytes |      1191 bytes |    101808 bytes|
+|[B1.3] Prepend N characters (memUsed)                                     |        807.9 kB |         20.3 MB |        244.6 kB|
+|[B1.3] Prepend N characters (parseTime)                                   |           13 ms |         1059 ms |           28 ms|
+|[B1.4] Insert N characters at random positions (time)                     |          100 ms |          933 ms |          164 ms|
+|[B1.4] Insert N characters at random positions (avgUpdateSize)            |        29 bytes |       106 bytes |       106 bytes|
+|[B1.4] Insert N characters at random positions (docSize)                  |      4581 bytes |      4681 bytes |    106556 bytes|
+|[B1.4] Insert N characters at random positions (memUsed)                  |        732.5 kB |         22.4 MB |        161.1 kB|
+|[B1.4] Insert N characters at random positions (parseTime)                |           12 ms |          455 ms |           20 ms|
+|[B1.5] Insert N words at random positions (time)                          |          112 ms |         1921 ms |          312 ms|
+|[B1.5] Insert N words at random positions (avgUpdateSize)                 |        34 bytes |       115 bytes |       115 bytes|
+|[B1.5] Insert N words at random positions (docSize)                       |     13239 bytes |     20583 bytes |    115398 bytes|
+|[B1.5] Insert N words at random positions (memUsed)                       |          1.5 MB |         62.1 MB |          2.1 MB|
+|[B1.5] Insert N words at random positions (parseTime)                     |           15 ms |         1418 ms |           88 ms|
+|[B1.6] Insert string, then delete it (time)                               |            5 ms |          739 ms |           24 ms|
+|[B1.6] Insert string, then delete it (avgUpdateSize)                      |      1053 bytes |      1147 bytes |      1147 bytes|
+|[B1.6] Insert string, then delete it (docSize)                            |        38 bytes |      1193 bytes |      1207 bytes|
+|[B1.6] Insert string, then delete it (memUsed)                            |             0 B |            6 MB |             0 B|
+|[B1.6] Insert string, then delete it (parseTime)                          |            5 ms |          191 ms |           10 ms|
+|[B1.7] Insert/Delete strings at random positions (time)                   |          110 ms |         1634 ms |          230 ms|
+|[B1.7] Insert/Delete strings at random positions (avgUpdateSize)          |        30 bytes |       118 bytes |       118 bytes|
+|[B1.7] Insert/Delete strings at random positions (docSize)                |      6346 bytes |     14589 bytes |    118263 bytes|
+|[B1.7] Insert/Delete strings at random positions (memUsed)                |        974.6 kB |         40.4 MB |        398.2 kB|
+|[B1.7] Insert/Delete strings at random positions (parseTime)              |           17 ms |          838 ms |           35 ms|
+|[B1.8] Append N numbers (time)                                            |           96 ms |          919 ms |          183 ms|
+|[B1.8] Append N numbers (avgUpdateSize)                                   |        32 bytes |       111 bytes |       111 bytes|
+|[B1.8] Append N numbers (docSize)                                         |      5964 bytes |      5501 bytes |    110604 bytes|
+|[B1.8] Append N numbers (memUsed)                                         |        200.8 kB |         21.4 MB |          197 kB|
+|[B1.8] Append N numbers (parseTime)                                       |            5 ms |          428 ms |           22 ms|
+|[B1.9] Insert Array of N numbers (time)                                   |            3 ms |          336 ms |           24 ms|
+|[B1.9] Insert Array of N numbers (avgUpdateSize)                          |      5953 bytes |      5437 bytes |      5437 bytes|
+|[B1.9] Insert Array of N numbers (docSize)                                |      5953 bytes |      5498 bytes |      5498 bytes|
+|[B1.9] Insert Array of N numbers (memUsed)                                |           30 kB |          6.3 MB |        175.5 kB|
+|[B1.9] Insert Array of N numbers (parseTime)                              |            7 ms |          103 ms |           13 ms|
+|[B1.10] Prepend N numbers (time)                                          |           82 ms |         2175 ms |          202 ms|
+|[B1.10] Prepend N numbers (avgUpdateSize)                                 |        32 bytes |       106 bytes |       106 bytes|
+|[B1.10] Prepend N numbers (docSize)                                       |      5983 bytes |      5501 bytes |    105683 bytes|
+|[B1.10] Prepend N numbers (memUsed)                                       |          1.4 MB |         21.1 MB |          536 kB|
+|[B1.10] Prepend N numbers (parseTime)                                     |           10 ms |         1024 ms |           31 ms|
+|[B1.11] Insert N numbers at random positions (time)                       |           96 ms |          955 ms |          184 ms|
+|[B1.11] Insert N numbers at random positions (avgUpdateSize)              |        34 bytes |       110 bytes |       110 bytes|
+|[B1.11] Insert N numbers at random positions (docSize)                    |      9587 bytes |      8932 bytes |    110416 bytes|
+|[B1.11] Insert N numbers at random positions (memUsed)                    |          1.2 MB |         22.1 MB |        197.9 kB|
+|[B1.11] Insert N numbers at random positions (parseTime)                  |           14 ms |          441 ms |           21 ms|
+|[B3.1] 20√N clients concurrently set number in Map (time)                 |           97 ms |          518 ms |            8 ms|
+|[B3.1] 20√N clients concurrently set number in Map (updateSize)           |     19761 bytes |     37692 bytes |     37692 bytes|
+|[B3.1] 20√N clients concurrently set number in Map (docSize)              |     13000 bytes |     34187 bytes |     37692 bytes|
+|[B3.1] 20√N clients concurrently set number in Map (memUsed)              |          2.5 MB |         11.6 MB |          1.2 MB|
+|[B3.1] 20√N clients concurrently set number in Map (parseTime)            |           24 ms |          590 ms |           16 ms|
+|[B3.2] 20√N clients concurrently set Object in Map (time)                 |          111 ms |          733 ms |           26 ms|
+|[B3.2] 20√N clients concurrently set Object in Map (updateSize)           |     38315 bytes |     58790 bytes |     58790 bytes|
+|[B3.2] 20√N clients concurrently set Object in Map (docSize)              |     16727 bytes |     50965 bytes |     58790 bytes|
+|[B3.2] 20√N clients concurrently set Object in Map (memUsed)              |          3.2 MB |         22.6 MB |            2 MB|
+|[B3.2] 20√N clients concurrently set Object in Map (parseTime)            |           24 ms |          788 ms |           39 ms|
+|[B3.3] 20√N clients concurrently set String in Map (time)                 |          114 ms |          530 ms |           23 ms|
+|[B3.3] 20√N clients concurrently set String in Map (updateSize)           |   1104821 bytes |   1124050 bytes |   1124050 bytes|
+|[B3.3] 20√N clients concurrently set String in Map (docSize)              |     14840 bytes |   1118360 bytes |   1124050 bytes|
+|[B3.3] 20√N clients concurrently set String in Map (memUsed)              |          3.8 MB |         17.4 MB |          5.4 MB|
+|[B3.3] 20√N clients concurrently set String in Map (parseTime)            |           23 ms |          681 ms |           35 ms|
+|[B3.4] 20√N clients concurrently insert text in Array (time)              |           99 ms |         1053 ms |           15 ms|
+|[B3.4] 20√N clients concurrently insert text in Array (updateSize)        |     20946 bytes |     73670 bytes |     73670 bytes|
+|[B3.4] 20√N clients concurrently insert text in Array (docSize)           |     10431 bytes |     34821 bytes |     73731 bytes|
+|[B3.4] 20√N clients concurrently insert text in Array (memUsed)           |          2.9 MB |         19.8 MB |          1.6 MB|
+|[B3.4] 20√N clients concurrently insert text in Array (parseTime)         |           11 ms |         1242 ms |           30 ms|
+
+
+|[B1.4] Insert N characters at random positions (time)                     |           99 ms |          921 ms |          218 ms|
+|[B1.4] Insert N characters at random positions (time)                     |           97 ms |          917 ms |          177 ms|
+|[B1.4] Insert N characters at random positions (time)                     |          100 ms |          933 ms |          164 ms|
+|[B1.5] Insert N words at random positions (time)                          |          109 ms |         1910 ms |          569 ms|
+|[B1.5] Insert N words at random positions (time)                          |          110 ms |         1865 ms |          461 ms|
+|[B1.5] Insert N words at random positions (time)                          |          112 ms |         1921 ms |          312 ms|
+

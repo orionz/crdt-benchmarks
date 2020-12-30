@@ -105,13 +105,13 @@ const benchmarkDeltaCrdts = (id, inputData, changeFunction, check) => {
  * @param {function(any, any):void} check Check if the benchmark result is correct (all clients end up with the expected result)
  */
 const benchmarkAllAutomerge = (id, init, inputData, changeFunction, check) => {
-  benchmarkAutomerge(id, init, inputData, changeFunction, check)
+  //benchmarkAutomerge(id, init, inputData, changeFunction, check)
   benchmarkAutomerge1(id, init, inputData, changeFunction, check)
   benchmarkAutomergeWASM(id, init, inputData, changeFunction, check)
 }
 
 const benchmarkAllAutomergeText = (id, inputData, changeFunction, check) => {
-  benchmarkAutomerge(id, doc => { doc.text = new Automerge.Text() }, inputData, changeFunction, check)
+  //benchmarkAutomerge(id, doc => { doc.text = new Automerge.Text() }, inputData, changeFunction, check)
   benchmarkAutomerge1(id, doc => { doc.text = new Automerge1.Text() }, inputData, changeFunction, check)
   benchmarkAutomergeWASM(id, doc => { doc.text = new AutomergeWASM.Text() }, inputData, changeFunction, check)
 }
@@ -194,9 +194,10 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
   let updateSize = 0
   benchmarkTime('automergeWASM', `${id} (time)`, () => {
     for (let i = 0; i < inputData.length; i++) {
-      const [updatedDoc,change] = AutomergeWASM.change2(doc1, doc => {
+      const updatedDoc = AutomergeWASM.change(doc1, doc => {
         changeFunction(doc, inputData[i], i)
       })
+      const change = AutomergeWASM.getLastLocalChange(updatedDoc)
       updateSize += change.length
       doc2 = AutomergeWASM.applyChanges(doc2, [change])
       doc1 = updatedDoc
@@ -643,4 +644,3 @@ const benchmarkAutomergeWASM = (id, init, inputData, changeFunction, check) => {
     }
   )
 }
-

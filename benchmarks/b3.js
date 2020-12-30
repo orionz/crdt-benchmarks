@@ -101,7 +101,7 @@ const benchmarkDeltaCrdts = (id, changeDoc, check) => {
 }
 
 const benchmarkAutomerge = (id, initDoc, changeDoc2, check) => {
-    benchmarkAutomerge0(id, initDoc, changeDoc2, check)
+//    benchmarkAutomerge0(id, initDoc, changeDoc2, check)
     benchmarkAutomerge1(id, initDoc, changeDoc2, check)
     benchmarkAutomergeWASM(id, initDoc, changeDoc2, check)
 }
@@ -200,7 +200,8 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
   for (let i = 0; i < sqrtN; i++) {
     docs.push(AutomergeWASM.init())
   }
-  const [initDoc, initChange]  = AutomergeWASM.change2(AutomergeWASM.init(), init)
+  const initDoc = AutomergeWASM.change(AutomergeWASM.init(), init)
+  const initChange = AutomergeWASM.getLastLocalChange(initDoc)
   AutomergeWASM.free(initDoc)
   if (initChange) {
     for (let i = 0; i < docs.length; i++) {
@@ -209,7 +210,8 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
   }
   const changes = []
   for (let i = 0; i < docs.length; i++) {
-    const [ updatedDoc , change ] = AutomergeWASM.change2(docs[i], d => { changeDoc(d, i) })
+    const updatedDoc = AutomergeWASM.change(docs[i], d => { changeDoc(d, i) })
+    const change = AutomergeWASM.getLastLocalChange(updatedDoc)
     changes.push(change)
     docs[i] = updatedDoc
   }
@@ -330,6 +332,7 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
       })
     }
   )
+  /*
   benchmarkDeltaCrdts(
     benchmarkName,
     (doc, i) => {
@@ -343,6 +346,7 @@ const benchmarkAutomergeWASM = (id, init, changeDoc, check) => {
       t.assert(len === sqrtN)
     }
   )
+  */
   benchmarkAutomerge(
     benchmarkName,
     doc => { doc.array = [] },

@@ -158,15 +158,18 @@ const benchmarkAutomergeWASM = (id, changeDoc1, changeDoc2, check) => {
   }
   */
   const emptyDoc = AutomergeWASM.init()
-  let [doc1, change1] = AutomergeWASM.change2(emptyDoc, doc => {
+  let doc1 = AutomergeWASM.change(emptyDoc, doc => {
     doc.text = new AutomergeWASM.Text()
     doc.text.insertAt(0, ...initText)
   })
+  let change1 = AutomergeWASM.getLastLocalChange(doc1)
   let doc2 = AutomergeWASM.applyChanges(AutomergeWASM.init(), [change1])
   let updateSize = 0
   benchmarkTime('automergeWASM', `${id} (time)`, () => {
-    const [updatedDoc1, change1] = AutomergeWASM.change2(doc1, changeDoc1)
-    const [updatedDoc2, change2] = AutomergeWASM.change2(doc2, changeDoc2)
+    const updatedDoc1, change1 = AutomergeWASM.change(doc1, changeDoc1)
+    const change1 = AutomergeWASM.getLastLocalChange(updatedDoc1)
+    const updatedDoc2 = AutomergeWASM.change(doc2, changeDoc2)
+    const change2 = AutomergeWASM.getLastLocalChange(updatedDoc2)
     updateSize += change1.length + change2.length
     doc2 = AutomergeWASM.applyChanges(updatedDoc2, [change1])
     doc1 = AutomergeWASM.applyChanges(updatedDoc1, [change2])

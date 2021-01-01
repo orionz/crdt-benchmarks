@@ -20,7 +20,7 @@ const terserPlugin = terser({
 })
 
 export default [{
-  input: './benchmarks/run.js',
+  input: './src/run.js',
   output: {
     file: './dist/benchmark.cjs',
     format: 'cjs',
@@ -33,7 +33,7 @@ export default [{
     }
   }
 }, {
-  input: './benchmarks/run.js',
+  input: './src/run.js',
   output: {
     file: './dist/benchmark.js',
     format: 'iife',
@@ -46,7 +46,7 @@ export default [{
     commonjs()
   ]
 }, {
-  input: './benchmarks/bundleYjs.js',
+  input: './src/bundleYjs.js',
   output: {
     file: './dist/bundleYjs.js',
     format: 'es',
@@ -60,7 +60,7 @@ export default [{
     terserPlugin
   ]
 }, {
-  input: './benchmarks/bundleDeltaCrdts.js',
+  input: './src/bundleDeltaCrdts.js',
   output: {
     file: './dist/bundleDeltaCrdts.js',
     format: 'es',
@@ -77,7 +77,7 @@ export default [{
     terserPlugin
   ]
 }, {
-  input: './benchmarks/bundleAutomerge.js',
+  input: './src/bundleAutomerge.js',
   output: {
     file: './dist/bundleAutomerge.js',
     format: 'es',
@@ -91,7 +91,7 @@ export default [{
     terserPlugin
   ]
 }, {
-  input: './benchmarks/bundleAutomerge1.js',
+  input: './src/bundleAutomerge1.js',
   output: {
     file: './dist/bundleAutomerge1.js',
     format: 'es',
@@ -105,7 +105,7 @@ export default [{
     terserPlugin
   ]
 }, {
-  input: './benchmarks/bundleAutomergeWASM.js',
+  input: './src/bundleAutomergeWASM.js',
   output: {
     file: './dist/bundleAutomergeWASM.js',
     format: 'es',

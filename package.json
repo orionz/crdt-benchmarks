@@ -14,6 +14,7 @@
     "start": "npm run dist && node --expose-gc dist/benchmark.cjs",
     "watch": "npm run dist && rollup -wc",
     "perf": "0x --output-dir perf dist/benchmark.cjs",
+    "perf1": "0x --output-dir perf oneshot.js",
     "lint": "standard && tsc"
   },
   "repository": {
@@ -32,7 +33,7 @@
   "homepage": "https://github.com/dmonad/crdt-benchmarks#readme",
   "dependencies": {
     "automerge": "^0.14.1",
-    "automerge-wasm": "orionz/automerge#wasm-node-local-change",
+    "automerge-wasm": "orionz/automerge#wasm-node",
     "automerge1": "orionz/automerge#change2",
     "delta-crdts": "^0.10.3",
     "delta-crdts-msgpack-codec": "^0.2.0",
